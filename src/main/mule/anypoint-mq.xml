@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<anypoint-mq:config name="Anypoint_MQ_Config" doc:name="Anypoint MQ Config" doc:id="3ea2974c-397f-49e4-96d5-f906f63b8f7d" >
+		<anypoint-mq:connection clientId="5a173da995254f7db1078a82b9c6f098" clientSecret="E22ae8150d6341eeA5cc60Cb382C6E7d" />
+	</anypoint-mq:config>
+	<flow name="anypoint-mqFlow" doc:id="b6040463-e1c3-4abc-abc9-3bde4194c239" >
+		<http:listener doc:name="Listener" doc:id="70f72f74-93c6-4919-8c87-565597f12b2f" path="/mq" config-ref="HTTP_Listener_config"/>
+		<set-variable value="#[correlationId]" doc:name="Set Variable" doc:id="35957fe9-9f10-43f5-9c28-bd2fe50b224d" variableName="correlationID"/>
+		<anypoint-mq:publish doc:name="Publish" doc:id="33e7ec77-d208-4b3d-9d02-25cc5e82b06b" config-ref="Anypoint_MQ_Config" destination="anypoint-mq-dev">
+			<anypoint-mq:properties ><![CDATA[#[output application/java
+---
+{
+	CorrelationID : vars.correlationID
+}]]]></anypoint-mq:properties>
+		</anypoint-mq:publish>
+	</flow>
+	<flow name="anypoint-mqFlow1" doc:id="30f7bb4d-783e-4a46-b475-729037339318" >
+		<anypoint-mq:subscriber doc:name="Subscriber" doc:id="2206225b-1048-4d81-9cca-030256974bc5" config-ref="Anypoint_MQ_Config" destination="anypoint-mq-dev" acknowledgementMode="MANUAL">
+			<anypoint-mq:circuit-breaker onErrorTypes="ANY" errorsThreshold="2" tripTimeout="1" tripTimeoutUnit="MINUTES" />
+		</anypoint-mq:subscriber>
+		<logger level="INFO" doc:name="Logger" doc:id="38342d9d-619c-4d18-b069-c5f7730b81c8" message="#[payload]"/>
+<!-- [STUDIO:"Request"]		<http:request method="GET" doc:name="Request" doc:id="0b93da11-ef98-40ea-abd1-8d79ac5a9a3f" config-ref="HTTP_Request_configuration" path="/error"/> [STUDIO] -->
+		<anypoint-mq:ack doc:name="Ack" doc:id="200cf08e-2d32-494f-b1fc-1b5dec6dc465" config-ref="Anypoint_MQ_Config" ackToken="#[attributes.ackToken]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="12801c32-40be-411c-adab-f133b97d7702" type="ANY">
+				<anypoint-mq:nack doc:name="Nack" doc:id="0755a9b1-9252-434d-be63-3e53003232a7" config-ref="Anypoint_MQ_Config" ackToken="#[attributes.ackToken]"/>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

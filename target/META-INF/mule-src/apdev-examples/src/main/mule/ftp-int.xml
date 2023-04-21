@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="883febd1-a7c1-4e17-a650-e5069b1afce1" >
+		<db:my-sql-connection host="${db.host}" port="${db.port}" user="${db.user}" password="${db.password}" database="${db.database}" />
+	</db:config>
+	<flow name="syncDBaccountsToCSV" doc:id="d4f7b6d5-1290-43f1-bc07-322da38b86d3" initialState="stopped">
+		<db:listener table="accounts" doc:name="accounts" doc:id="0441c7c7-7efd-4241-8480-b311e7daa745" config-ref="Database_Config" watermarkColumn="accountID" idColumn="accountID">
+			<scheduling-strategy >
+				<fixed-frequency frequency="10" timeUnit="SECONDS" />
+			</scheduling-strategy>
+		</db:listener>
+		<ee:transform doc:name="Java to CSV" doc:id="175d5553-92e7-420b-9beb-6cb2e216ff2d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/csv header=false
+---
+[payload]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<file:write doc:name="DBaccounts.csv" doc:id="a0d855b8-2b49-46d9-9383-6b142165c5e2" config-ref="File_Config" path="output/DBaccounts.csv" mode="APPEND"/>
+		<logger level="INFO" doc:name="payload" doc:id="14dbe7e2-3aa5-43e3-860d-d45dec2c97ec" message="#[payload]"/>
+	</flow>
+	<flow name="syncDBaccountsWithPostal" doc:id="e72c956e-5236-4cdc-992a-09b9db04e39b" initialState="stopped">
+		<scheduler doc:name="Scheduler" doc:id="394e2847-a5a1-4dc6-90ec-7f553b5371e6" >
+			<scheduling-strategy >
+				<fixed-frequency />
+			</scheduling-strategy>
+		</scheduler>
+		<os:retrieve doc:name="lastAccountID" doc:id="6c7a13a6-44ed-4c38-b466-8d726e4ac09b" key="lastAccountID" target="lastAccountID">
+			<os:default-value ><![CDATA[0]]></os:default-value>
+		</os:retrieve>
+		<db:select doc:name="Select Data on Postal" doc:id="dc59fe68-109f-4f6a-a706-912bf398cba4" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM accounts WHERE postal = :postal and accountID > :lastAccountID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	postal : p('db.postal'),
+	lastAccountID: vars.lastAccountID
+}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="d27ee364-5454-40b1-ad22-55f9121c81ef" >
+			<when expression="#[! isEmpty(payload)]">
+				<os:store doc:name="lastAccountID" doc:id="85a2deb8-336d-4d55-bdc9-58cd9d639e24" key="lastAccountID">
+			<os:value><![CDATA[#[max(payload.*accountID)]]]></os:value>
+		</os:store>
+				<file:write doc:name="Write DBaccountsPostal.csv" doc:id="3be44f03-7162-4c0e-ae96-7e218bfde9f1" config-ref="File_Config" path="output/DBaccountsPostal.csv" mode="APPEND">
+			<file:content><![CDATA[#[output application/csv header=false
+ ---
+payload]]]></file:content>
+		</file:write>
+				<logger level="INFO" doc:name="Logger" doc:id="b5813e64-c628-4890-a972-4638b7eba942" message="#[output application/csv --- payload]" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="03726951-5c0f-486b-9006-e561e9b85808" message="No new record found"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="ftp-intFlow" doc:id="226a6386-95cb-4718-bbb0-c5764a6e65bd" >
+		<file:listener doc:name="accountsCSV" doc:id="4cf9ba07-69b7-406b-b458-7960c63eda90" config-ref="File_Config" directory="C:\Users\krish\OneDrive\Documents\True Alliance\FTP\input" moveToDirectory="C:\Users\krish\OneDrive\Documents\True Alliance\FTP\output" renameTo='#[attributes.fileName ++ ".backup"]'>
+			<scheduling-strategy >
+				<fixed-frequency />
+			</scheduling-strategy>
+			<file:matcher filenamePattern="*.csv" />
+		</file:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="041e3f14-5a61-40a7-a982-5d8f0c6562d7" message="#[payload]"/>
+	</flow>
+</mule>
