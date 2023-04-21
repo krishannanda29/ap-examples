@@ -1,0 +1,12 @@
+file:
+  accountsDir: "C:/Users/krish/OneDrive/Documents/True Alliance/FTP"
+db:
+  host: "mudb.learn.mulesoft.com"
+  port: "3306"
+  user: "mule"
+  password: "mule"
+  database: "training"
+  postal: "94015"
+  
+http:
+  port: "8081"

@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<vm:config name="VMDemo" doc:name="VM Config" doc:id="9d914200-e96f-4136-96ff-7d9a687f952d" >
+		<vm:queues >
+			<vm:queue queueName="vmdemo" />
+		</vm:queues>
+	</vm:config>
+	<flow name="helloFlow" doc:id="e8d3e7bd-3622-45e5-bead-146de1e47795" >
+		<http:listener doc:name="GET/hello" doc:id="cc4d52f9-4e1a-49ea-9af5-dc9ff187c3a8" path="/hello" allowedMethods="GET" config-ref="HTTP_Listener_config"/>
+		<set-payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;&#10;  {&#10;    "ITEMNMBR": "2504-1-DEMO",&#10;    "SERLNUMBR": "",&#10;    "LOCNCODE": "CAL",&#10;    "BIN": "127172",&#10;    "ITEMDESC": "ELEC CTI CONVEY OVEN - DIGITAL W 1345 1346 DEMO",&#10;    "UNITCOST": "5413.47000"&#10;  }]' doc:name="Hello" doc:id="b2f265da-7874-4a9c-8c20-6901258bc676" />
+		<ee:transform doc:name="queryParams" doc:id="8d95699a-dcc9-4119-bcd4-412bfc3af572">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="queryParams"><![CDATA[%dw 2.0
+output application/java
+---
+attributes.queryParams]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="paylaod" doc:id="cd78a638-61de-4260-8e52-4e05e9a0be0e" message='#[vars.queryParams.itemNumber as String ++ " SerialNumber" ++ vars.queryParams.serialNumber as String]'/>
+	</flow>
+	<flow name="apdev-examplesFlow" doc:id="564e80cc-dded-4ca1-9e4b-ff2b61f9659a" >
+		<vm:listener queueName="vmdemo" doc:name="Listener" doc:id="9a0b53a2-80f1-401b-8fe1-c2739703e17e" config-ref="VMDemo" timeout="300"/>
+		<set-variable value="VM listener success" doc:name="Set Variable" doc:id="55a6283f-1bff-45af-85b2-1923ddf0a7fc" variableName="message"/>
+		<set-payload value="#[vars.message]" doc:name="Set Payload" doc:id="0ff299be-1752-4d5d-be8b-3635bc91da2a" />
+		<logger level="INFO" doc:name="Logger" doc:id="4f161aee-3226-480a-a359-4acfbcef4b51" message="#[vars.message]"/>
+		<ee:transform doc:name="Transform Message" doc:id="4cf214d7-2628-45c6-8300-700acb614e25">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+	</flow>
+	<flow name="forEachFlow" doc:id="09cdbc17-443a-4888-9444-81ce662296e2" >
+		<http:listener doc:name="GET/forEach" doc:id="e6bbed04-e3a7-4286-b0d7-e1787374ec1a" path="/forEach" allowedMethods="GET" config-ref="HTTP_Listener_config"/>
+		<set-payload value="#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;    &quot;LastModifiedDate&quot;: &quot;2023-03-24T05:34:37.000Z&quot;,&#10;    &quot;FSL__Prevent_Geocoding_For_Chatter_Actions__c&quot;: &quot;false&quot;,&#10;    &quot;Account&quot;: {&#10;      &quot;Debtor_ID__c&quot;: &quot;600039&quot;,&#10;      &quot;type&quot;: &quot;Account&quot;&#10;    },&#10;    &quot;Pre_Job_Requirements__c&quot;: &quot;None&quot;,&#10;    &quot;Division_Type__c&quot;: &quot;Conversion | 163-1570&quot;,&#10;    &quot;type&quot;: &quot;WorkOrder&quot;,&#10;    &quot;Total_Claim__c&quot;: &quot;0.0&quot;,&#10;    &quot;Total_Parts_Claim__c&quot;: &quot;0.0&quot;,&#10;    &quot;Status&quot;: &quot;Finance Review&quot;,&#10;    &quot;IsDeleted&quot;: &quot;false&quot;,&#10;    &quot;Subtotal&quot;: &quot;0.0&quot;,&#10;    &quot;WorkOrderNumber&quot;: &quot;00000401&quot;,&#10;    &quot;GrandTotal&quot;: &quot;0.0&quot;,&#10;    &quot;Id&quot;: &quot;0WO9p000000KSD3GAO&quot;,&#10;    &quot;AssetId&quot;: &quot;02i9p000000MKsvAAG&quot;,&#10;    &quot;WorkOrderLineItems&quot;: [&#10;	&#10;      {&#10;        &quot;ServiceAppointmentCount&quot;: &quot;0&quot;,&#10;        &quot;LastModifiedDate&quot;: &quot;2023-03-30T01:42:46.000Z&quot;,&#10;        &quot;GP_Price_Check_Status__c&quot;: &quot;Completed&quot;,&#10;        &quot;Product_Code__c&quot;: &quot;CMDSP-180818&quot;,&#10;        &quot;Division_Type__c&quot;: &quot;Conversion | 163-1570&quot;,&#10;        &quot;type&quot;: &quot;WorkOrderLineItem&quot;,	&#10;        &quot;ListPrice&quot;: &quot;44.29&quot;,&#10;        &quot;Work_Order_Status__c&quot;: &quot;Finance Review&quot;,&#10;        &quot;GP_Debit_Division_Code__c&quot;: &quot;2030&quot;,&#10;        &quot;CreatedById&quot;: &quot;0059p000001n2hdAAA&quot;,&#10;        &quot;X3rd_Party_Parts_Description__c&quot;: &quot;dfgseg&quot;,&#10;        &quot;Status&quot;: &quot;New&quot;,&#10;        &quot;IsDeleted&quot;: &quot;false&quot;,&#10;        &quot;RootWorkOrderLineItemId&quot;: &quot;1WL9p0000006aLlGAI&quot;,&#10;        &quot;Priority&quot;: &quot;Low&quot;,&#10;        &quot;Subtotal&quot;: &quot;0.0&quot;,&#10;		&quot;GP_Line_item_Sequence__c&quot;:&quot;asalks123&quot;,&#10;        &quot;PricebookEntry&quot;: {&#10;          &quot;Id&quot;: &quot;01u6F00000flcCuQAI&quot;,&#10;          &quot;type&quot;: &quot;PricebookEntry&quot;,&#10;          &quot;Name&quot;: &quot;Filter&quot;&#10;        },&#10;        &quot;PricebookEntryId&quot;: &quot;01u6F00000flcCuQAI&quot;,&#10;        &quot;CreatedDate&quot;: &quot;2023-03-06T10:08:50.000Z&quot;,&#10;        &quot;GP_Item_Number__c&quot;: &quot;CMDSP-180818&quot;,&#10;        &quot;Id&quot;: &quot;1WL9p0000006aLlGAI&quot;,&#10;        &quot;Total_Cost_Parts__c&quot;: &quot;0.0&quot;,&#10;        &quot;Consumed__c&quot;: &quot;true&quot;,&#10;        &quot;LineItemNumber&quot;: &quot;00000001&quot;,&#10;        &quot;Product2&quot;: {&#10;          &quot;ProductCode&quot;: &quot;CMDSP-180818&quot;,&#10;          &quot;Id&quot;: &quot;01t6F00000B1wusQAB&quot;,&#10;          &quot;type&quot;: &quot;Product2&quot;,&#10;          &quot;Name&quot;: &quot;Filter&quot;&#10;        },&#10;        &quot;Covered_by_Warranty__c&quot;: &quot;false&quot;,&#10;        &quot;IsClosed&quot;: &quot;false&quot;,&#10;        &quot;IsGeneratedFromMaintenancePlan&quot;: &quot;false&quot;,&#10;        &quot;StatusCategory&quot;: &quot;New&quot;,&#10;        &quot;DurationType&quot;: &quot;Hours&quot;,&#10;        &quot;LocationId&quot;: &quot;1319p00000033B3AAI&quot;,&#10;        &quot;Quantity&quot;: &quot;1.0&quot;,&#10;        &quot;GL_Debit_Code__c&quot;: &quot;320-2030-630&quot;,&#10;        &quot;SystemModstamp&quot;: &quot;2023-03-30T01:42:46.000Z&quot;,&#10;        &quot;UnitPrice&quot;: &quot;10.9&quot;,&#10;        &quot;Discount__c&quot;: &quot;0.0&quot;,&#10;        &quot;Product2Id&quot;: &quot;01t6F00000B1wusQAB&quot;,&#10;        &quot;Product_Category__c&quot;: &quot;PARTS&quot;,&#10;        &quot;Division_State__c&quot;: &quot;VIC | 320&quot;,&#10;        &quot;WorkOrderId&quot;: &quot;0WO9p000000KSD3GAO&quot;,&#10;        &quot;TotalPrice&quot;: &quot;0.0&quot;,&#10;        &quot;GP_Credit_Division_Code__c&quot;: &quot;1030&quot;,&#10;        &quot;FSL__IsFillInCandidate__c&quot;: &quot;true&quot;,&#10;        &quot;LastModifiedById&quot;: &quot;0059p000001n2hdAAA&quot;,&#10;        &quot;GL_Credit_Code__c&quot;: &quot;320-1030-630&quot;,&#10;        &#10;        &quot;Location&quot;: {&#10;          &quot;type&quot;: &quot;Location&quot;&#10;        }&#10;      },&#10;	  &#10;      {&#10;        &quot;ServiceAppointmentCount&quot;: &quot;0&quot;,&#10;        &quot;LastModifiedDate&quot;: &quot;2023-03-30T01:43:18.000Z&quot;,&#10;        &quot;GP_Price_Check_Status__c&quot;: &quot;Completed&quot;,&#10;        &quot;Product_Code__c&quot;: &quot;CALLOUTFEE&quot;,&#10;        &quot;Division_Type__c&quot;: &quot;Conversion | 163-1570&quot;,&#10;        &quot;type&quot;: &quot;WorkOrderLineItem&quot;,&#10;        &quot;ListPrice&quot;: &quot;115.0&quot;,&#10;        &quot;Work_Order_Status__c&quot;: &quot;Finance Review&quot;,&#10;        &quot;GP_Debit_Division_Code__c&quot;: &quot;2030&quot;,&#10;        &quot;CreatedById&quot;: &quot;0059p000001n2hdAAA&quot;,&#10;        &quot;Serial_s__c&quot;: &quot;666ABC&quot;,&#10;        &quot;Status&quot;: &quot;New&quot;,&#10;        &quot;IsDeleted&quot;: &quot;false&quot;,&#10;        &quot;RootWorkOrderLineItemId&quot;: &quot;1WL9p0000006aNNGAY&quot;,&#10;        &quot;Priority&quot;: &quot;Low&quot;,&#10;        &quot;Subtotal&quot;: &quot;0.0&quot;,&#10;        &quot;PricebookEntry&quot;: {&#10;          &quot;Id&quot;: &quot;01u6F00000flchVQAQ&quot;,&#10;          &quot;type&quot;: &quot;PricebookEntry&quot;,&#10;          &quot;Name&quot;: &quot;Service Call Out Fee&quot;&#10;        },&#10;        &quot;PricebookEntryId&quot;: &quot;01u6F00000flchVQAQ&quot;,&#10;        &quot;CreatedDate&quot;: &quot;2023-03-06T10:09:27.000Z&quot;,&#10;        &quot;GP_Item_Number__c&quot;: &quot;3RDPARTYPART&quot;,&#10;        &quot;Id&quot;: &quot;1WL9p0000006aNNGAY&quot;,&#10;        &quot;Total_Cost_Parts__c&quot;: &quot;0.0&quot;,&#10;        &quot;Consumed__c&quot;: &quot;true&quot;,&#10;        &quot;Description&quot;: &quot;Jim's mowing rotor blade&quot;,&#10;        &quot;LineItemNumber&quot;: &quot;00000002&quot;,&#10;        &quot;Product2&quot;: {&#10;          &quot;ProductCode&quot;: &quot;CALLOUTFEE&quot;,&#10;          &quot;Id&quot;: &quot;01t6F00000B1xmJQAR&quot;,&#10;          &quot;type&quot;: &quot;Product2&quot;,&#10;          &quot;Name&quot;: &quot;Service Call Out Fee&quot;&#10;        },&#10;        &quot;Covered_by_Warranty__c&quot;: &quot;false&quot;,&#10;        &quot;IsClosed&quot;: &quot;false&quot;,&#10;        &quot;IsGeneratedFromMaintenancePlan&quot;: &quot;false&quot;,&#10;        &quot;StatusCategory&quot;: &quot;New&quot;,&#10;        &quot;DurationType&quot;: &quot;Hours&quot;,&#10;        &quot;Quantity&quot;: &quot;1.0&quot;,&#10;        &quot;GL_Debit_Code__c&quot;: &quot;320-2030-625&quot;,&#10;        &quot;SystemModstamp&quot;: &quot;2023-03-30T01:43:18.000Z&quot;,&#10;        &quot;UnitPrice&quot;: &quot;0.0&quot;,&#10;        &quot;Discount__c&quot;: &quot;0.0&quot;,&#10;        &quot;Product2Id&quot;: &quot;01t6F00000B1xmJQAR&quot;,&#10;        &quot;Product_Category__c&quot;: &quot;LABOR&quot;,&#10;        &quot;Division_State__c&quot;: &quot;VIC | 320&quot;,&#10;        &quot;WorkOrderId&quot;: &quot;0WO9p000000KSD3GAO&quot;,&#10;        &quot;TotalPrice&quot;: &quot;0.0&quot;,&#10;        &quot;GP_Credit_Division_Code__c&quot;: &quot;1030&quot;,&#10;        &quot;FSL__IsFillInCandidate__c&quot;: &quot;true&quot;,&#10;        &quot;LastModifiedById&quot;: &quot;0059p000001n2hdAAA&quot;,&#10;        &quot;GL_Credit_Code__c&quot;: &quot;320-1030-625&quot;&#10;      },&#10;	 &#10;      {&#10;		  &#10;        &quot;ServiceAppointmentCount&quot;: &quot;0&quot;,&#10;        &quot;LastModifiedDate&quot;: &quot;2023-03-30T01:43:18.000Z&quot;,&#10;        &quot;GP_Price_Check_Status__c&quot;: &quot;Completed&quot;,&#10;        &quot;Product_Code__c&quot;: &quot;CALLOUTFEE&quot;,&#10;        &quot;Division_Type__c&quot;: &quot;Conversion | 163-1570&quot;,&#10;        &quot;type&quot;: &quot;WorkOrderLineItem&quot;,&#10;        &quot;ListPrice&quot;: &quot;115.0&quot;,&#10;        &quot;Work_Order_Status__c&quot;: &quot;Finance Review&quot;,&#10;        &quot;GP_Debit_Division_Code__c&quot;: &quot;2030&quot;,&#10;        &quot;CreatedById&quot;: &quot;0059p000001n2hdAAA&quot;,&#10;        &quot;Serial_s__c&quot;: &quot;666ABC&quot;,&#10;        &quot;Status&quot;: &quot;New&quot;,&#10;        &quot;IsDeleted&quot;: &quot;false&quot;,&#10;        &quot;RootWorkOrderLineItemId&quot;: &quot;1WL9p0000006aNNGAY&quot;,&#10;        &quot;Priority&quot;: &quot;Low&quot;,&#10;        &quot;Subtotal&quot;: &quot;0.0&quot;,&#10;        &quot;PricebookEntry&quot;: {&#10;          &quot;Id&quot;: &quot;01u6F00000flchVQAQ&quot;,&#10;          &quot;type&quot;: &quot;PricebookEntry&quot;,&#10;          &quot;Name&quot;: &quot;Service Call Out Fee&quot;&#10;        },&#10;        &quot;PricebookEntryId&quot;: &quot;01u6F00000flchVQAQ&quot;,&#10;        &quot;CreatedDate&quot;: &quot;2023-03-06T10:09:27.000Z&quot;,&#10;        &quot;GP_Item_Number__c&quot;: &quot;3RDPARTYPART&quot;,&#10;        &quot;Id&quot;: &quot;1WL9p0000006aNNGAY455&quot;,&#10;        &quot;Total_Cost_Parts__c&quot;: &quot;0.0&quot;,&#10;        &quot;Consumed__c&quot;: &quot;true&quot;,&#10;        &quot;Description&quot;: &quot;Jim's mowing rotor blade&quot;,&#10;        &quot;LineItemNumber&quot;: &quot;00000002&quot;,&#10;        &quot;Product2&quot;: {&#10;          &quot;ProductCode&quot;: &quot;CALLOUTFEE&quot;,&#10;          &quot;Id&quot;: &quot;01t6F00000B1xmJQAR&quot;,&#10;          &quot;type&quot;: &quot;Product2&quot;,&#10;          &quot;Name&quot;: &quot;Service Call Out Fee&quot;&#10;        },&#10;        &quot;Covered_by_Warranty__c&quot;: &quot;false&quot;,&#10;        &quot;IsClosed&quot;: &quot;false&quot;,&#10;        &quot;IsGeneratedFromMaintenancePlan&quot;: &quot;false&quot;,&#10;        &quot;StatusCategory&quot;: &quot;New&quot;,&#10;        &quot;DurationType&quot;: &quot;Hours&quot;,&#10;        &quot;Quantity&quot;: &quot;1.0&quot;,&#10;        &quot;GL_Debit_Code__c&quot;: &quot;320-2030-625&quot;,&#10;        &quot;SystemModstamp&quot;: &quot;2023-03-30T01:43:18.000Z&quot;,&#10;        &quot;UnitPrice&quot;: &quot;0.0&quot;,&#10;        &quot;Discount__c&quot;: &quot;0.0&quot;,&#10;        &quot;Product2Id&quot;: &quot;01t6F00000B1xmJQAR&quot;,&#10;        &quot;Product_Category__c&quot;: &quot;LABOR&quot;,&#10;        &quot;Division_State__c&quot;: &quot;VIC | 320&quot;,&#10;        &quot;WorkOrderId&quot;: &quot;0WO9p000000KSD3GAO&quot;,&#10;        &quot;TotalPrice&quot;: &quot;0.0&quot;,&#10;        &quot;GP_Credit_Division_Code__c&quot;: &quot;1030&quot;,&#10;        &quot;FSL__IsFillInCandidate__c&quot;: &quot;true&quot;,&#10;        &quot;LastModifiedById&quot;: &quot;0059p000001n2hdAAA&quot;,&#10;        &quot;GL_Credit_Code__c&quot;: &quot;320-1030-625&quot;&#10;      },&#10;	  &#10;	  {&#10;        &quot;ServiceAppointmentCount&quot;: &quot;0&quot;,&#10;        &quot;LastModifiedDate&quot;: &quot;2023-03-30T01:43:18.000Z&quot;,&#10;        &quot;GP_Price_Check_Status__c&quot;: &quot;Completed&quot;,&#10;        &quot;Product_Code__c&quot;: &quot;CALLOUTFEE&quot;,&#10;        &quot;Division_Type__c&quot;: &quot;Conversion | 163-1570&quot;,&#10;        &quot;type&quot;: &quot;WorkOrderLineItem&quot;,&#10;        &quot;ListPrice&quot;: &quot;115.0&quot;,&#10;        &quot;Work_Order_Status__c&quot;: &quot;Finance Review&quot;,&#10;        &quot;GP_Debit_Division_Code__c&quot;: &quot;2030&quot;,&#10;        &quot;CreatedById&quot;: &quot;0059p000001n2hdAAA&quot;,&#10;        &quot;Status&quot;: &quot;New&quot;,&#10;        &quot;IsDeleted&quot;: &quot;false&quot;,&#10;        &quot;RootWorkOrderLineItemId&quot;: &quot;1WL9p0000006aNNGAY&quot;,&#10;        &quot;Priority&quot;: &quot;Low&quot;,&#10;        &quot;Subtotal&quot;: &quot;0.0&quot;,&#10;        &quot;PricebookEntry&quot;: {&#10;          &quot;Id&quot;: &quot;01u6F00000flchVQAQ&quot;,&#10;          &quot;type&quot;: &quot;PricebookEntry&quot;,&#10;          &quot;Name&quot;: &quot;Service Call Out Fee&quot;&#10;        },&#10;        &quot;PricebookEntryId&quot;: &quot;01u6F00000flchVQAQ&quot;,&#10;        &quot;CreatedDate&quot;: &quot;2023-03-06T10:09:27.000Z&quot;,&#10;        &quot;GP_Item_Number__c&quot;: &quot;3RDPARTYPART&quot;,&#10;        &quot;Id&quot;: &quot;1WL9p0000006aNNGAY55&quot;,&#10;        &quot;Total_Cost_Parts__c&quot;: &quot;0.0&quot;,&#10;        &quot;Consumed__c&quot;: &quot;false&quot;,&#10;        &quot;Description&quot;: &quot;Jim's mowing rotor blade&quot;,&#10;        &quot;LineItemNumber&quot;: &quot;00000002&quot;,&#10;        &quot;Product2&quot;: {&#10;          &quot;ProductCode&quot;: &quot;CALLOUTFEE&quot;,&#10;          &quot;Id&quot;: &quot;01t6F00000B1xmJQAR&quot;,&#10;          &quot;type&quot;: &quot;Product2&quot;,&#10;          &quot;Name&quot;: &quot;Service Call Out Fee&quot;&#10;        },&#10;        &quot;Covered_by_Warranty__c&quot;: &quot;false&quot;,&#10;        &quot;IsClosed&quot;: &quot;false&quot;,&#10;        &quot;IsGeneratedFromMaintenancePlan&quot;: &quot;false&quot;,&#10;        &quot;StatusCategory&quot;: &quot;New&quot;,&#10;        &quot;DurationType&quot;: &quot;Hours&quot;,&#10;        &quot;Quantity&quot;: &quot;1.0&quot;,&#10;        &quot;GL_Debit_Code__c&quot;: &quot;320-2030-625&quot;,&#10;        &quot;SystemModstamp&quot;: &quot;2023-03-30T01:43:18.000Z&quot;,&#10;        &quot;UnitPrice&quot;: &quot;0.0&quot;,&#10;        &quot;Discount__c&quot;: &quot;0.0&quot;,&#10;        &quot;Product2Id&quot;: &quot;01t6F00000B1xmJQAR&quot;,&#10;        &quot;Product_Category__c&quot;: &quot;LABOR&quot;,&#10;        &quot;Division_State__c&quot;: &quot;VIC | 320&quot;,&#10;        &quot;WorkOrderId&quot;: &quot;0WO9p000000KSD3GAO&quot;,&#10;        &quot;TotalPrice&quot;: &quot;0.0&quot;,&#10;        &quot;GP_Credit_Division_Code__c&quot;: &quot;1030&quot;,&#10;        &quot;FSL__IsFillInCandidate__c&quot;: &quot;true&quot;,&#10;        &quot;LastModifiedById&quot;: &quot;0059p000001n2hdAAA&quot;,&#10;        &quot;GL_Credit_Code__c&quot;: &quot;320-1030-625&quot;&#10;      },&#10;	  &#10;	  {&#10;        &quot;ServiceAppointmentCount&quot;: &quot;0&quot;,&#10;        &quot;LastModifiedDate&quot;: &quot;2023-03-30T01:43:18.000Z&quot;,&#10;        &quot;GP_Price_Check_Status__c&quot;: &quot;Completed&quot;,&#10;        &quot;Product_Code__c&quot;: &quot;CALLOUTFEE&quot;,&#10;        &quot;Division_Type__c&quot;: &quot;Conversion | 163-1570&quot;,&#10;        &quot;type&quot;: &quot;WorkOrderLineItem&quot;,&#10;        &quot;ListPrice&quot;: &quot;115.0&quot;,&#10;        &quot;Work_Order_Status__c&quot;: &quot;Finance Review&quot;,&#10;        &quot;GP_Debit_Division_Code__c&quot;: &quot;2030&quot;,&#10;        &quot;CreatedById&quot;: &quot;0059p000001n2hdAAA&quot;,&#10;        &quot;Status&quot;: &quot;New&quot;,&#10;        &quot;IsDeleted&quot;: &quot;false&quot;,&#10;        &quot;RootWorkOrderLineItemId&quot;: &quot;1WL9p0000006aNNGAY&quot;,&#10;        &quot;Priority&quot;: &quot;Low&quot;,&#10;        &quot;Subtotal&quot;: &quot;0.0&quot;,&#10;        &quot;PricebookEntry&quot;: {&#10;          &quot;Id&quot;: &quot;01u6F00000flchVQAQ&quot;,&#10;          &quot;type&quot;: &quot;PricebookEntry&quot;,&#10;          &quot;Name&quot;: &quot;Service Call Out Fee&quot;&#10;        },&#10;        &quot;PricebookEntryId&quot;: &quot;01u6F00000flchVQAQ&quot;,&#10;        &quot;CreatedDate&quot;: &quot;2023-03-06T10:09:27.000Z&quot;,&#10;        &quot;GP_Item_Number__c&quot;: &quot;3RDPARTYPART&quot;,&#10;        &quot;Id&quot;: &quot;1WL9p0000006aNNGAY3&quot;,&#10;        &quot;Total_Cost_Parts__c&quot;: &quot;0.0&quot;,&#10;        &quot;Consumed__c&quot;: &quot;true&quot;,&#10;        &quot;Description&quot;: &quot;Jim's mowing rotor blade&quot;,&#10;        &quot;LineItemNumber&quot;: &quot;00000002&quot;,&#10;        &quot;Product2&quot;: {&#10;          &quot;ProductCode&quot;: &quot;CALLOUTFEE&quot;,&#10;          &quot;Id&quot;: &quot;01t6F00000B1xmJQAR&quot;,&#10;          &quot;type&quot;: &quot;Product2&quot;,&#10;          &quot;Name&quot;: &quot;Service Call Out Fee&quot;&#10;        },&#10;        &quot;Covered_by_Warranty__c&quot;: &quot;false&quot;,&#10;        &quot;IsClosed&quot;: &quot;false&quot;,&#10;        &quot;IsGeneratedFromMaintenancePlan&quot;: &quot;false&quot;,&#10;        &quot;StatusCategory&quot;: &quot;New&quot;,&#10;        &quot;DurationType&quot;: &quot;Hours&quot;,&#10;        &quot;Quantity&quot;: &quot;1.0&quot;,&#10;        &quot;GL_Debit_Code__c&quot;: &quot;320-2030-625&quot;,&#10;        &quot;SystemModstamp&quot;: &quot;2023-03-30T01:43:18.000Z&quot;,&#10;        &quot;UnitPrice&quot;: &quot;0.0&quot;,&#10;        &quot;Discount__c&quot;: &quot;0.0&quot;,&#10;        &quot;Product2Id&quot;: &quot;01t6F00000B1xmJQAR&quot;,&#10;        &quot;Product_Category__c&quot;: &quot;LABOR&quot;,&#10;        &quot;Division_State__c&quot;: &quot;VIC | 320&quot;,&#10;        &quot;WorkOrderId&quot;: &quot;0WO9p000000KSD3GAO&quot;,&#10;        &quot;TotalPrice&quot;: &quot;0.0&quot;,&#10;        &quot;GP_Credit_Division_Code__c&quot;: &quot;1030&quot;,&#10;        &quot;FSL__IsFillInCandidate__c&quot;: &quot;true&quot;,&#10;        &quot;LastModifiedById&quot;: &quot;0059p000001n2hdAAA&quot;,&#10;        &quot;GL_Credit_Code__c&quot;: &quot;320-1030-625&quot;&#10;      }&#10;    ],&#10;    &quot;Discount&quot;: &quot;0.0&quot;,&#10;    &quot;IsClosed&quot;: &quot;false&quot;,&#10;    &quot;LineItemCount&quot;: &quot;7&quot;,&#10;    &quot;IsGeneratedFromMaintenancePlan&quot;: &quot;false&quot;,&#10;    &quot;FSL__VisitingHours__c&quot;: &quot;0OH9p0000000Mi5GAE&quot;,&#10;    &quot;StatusCategory&quot;: &quot;Completed&quot;,&#10;    &quot;OwnerId&quot;: &quot;0058u000000IFGJAA4&quot;,&#10;    &quot;Billing_Account__c&quot;: &quot;0019p000008hDklAAE&quot;,&#10;    &quot;Case_Exists_UI_field__c&quot;: &quot;false&quot;,&#10;    &quot;RecordTypeId&quot;: &quot;0129p000000CeCzAAK&quot;,&#10;    &quot;Pre_Payment_Required__c&quot;: &quot;false&quot;,&#10;    &quot;DurationType&quot;: &quot;Hours&quot;,&#10;    &quot;SendSurvey__c&quot;: &quot;false&quot;,&#10;    &quot;SystemModstamp&quot;: &quot;2023-03-24T05:34:37.000Z&quot;,&#10;    &quot;Parts_Handling_Fee__c&quot;: &quot;0.0&quot;,&#10;    &quot;Survey_Sent__c&quot;: &quot;false&quot;,&#10;    &quot;GP_Accoun_Receivable_Account__c&quot;: &quot;163-1570&quot;,&#10;    &quot;ServiceReportTemplateId&quot;: &quot;0SL9p0000000085GAA&quot;,&#10;    &quot;TotalPrice&quot;: &quot;0.0&quot;,&#10;    &quot;RootWorkOrderId&quot;: &quot;0WO9p000000KSD3GAO&quot;,&#10;    &quot;FSL__IsFillInCandidate__c&quot;: &quot;true&quot;,&#10;    &quot;GST__c&quot;: &quot;0.0&quot;,&#10;    &quot;ServiceAppointmentCount&quot;: &quot;1&quot;,&#10;    &quot;FSL__Scheduling_Priority__c&quot;: &quot;4.0&quot;,&#10;    &quot;Service_Agent_Job__c&quot;: &quot;true&quot;,&#10;    &quot;AccountId&quot;: &quot;0019p000005m3n7AAA&quot;,&#10;    &quot;CreatedById&quot;: &quot;0058u000000IFGJAA4&quot;,&#10;    &quot;Priority&quot;: &quot;Low&quot;,&#10;    &quot;Non_Consumed_Work_Order_Items__c&quot;: &quot;7.0&quot;,&#10;    &quot;Deposit_Paid__c&quot;: &quot;false&quot;,&#10;    &quot;Duration&quot;: &quot;2.0&quot;,&#10;    &quot;IsStopped&quot;: &quot;false&quot;,&#10;    &quot;CreatedDate&quot;: &quot;2023-03-02T10:35:40.000Z&quot;,&#10;    &quot;Pricebook2Id&quot;: &quot;01s6F00000F9eSoQAJ&quot;,&#10;    &quot;Total_Labour_Travel_Claim__c&quot;: &quot;0.0&quot;,&#10;    &quot;Billing_Contact__c&quot;: &quot;0039p000003tsyvAAA&quot;,&#10;    &quot;Call_Type__c&quot;: &quot;Charge Customer&quot;,&#10;    &quot;Labour_Handling_Fee__c&quot;: &quot;0.0&quot;,&#10;    &quot;WorkTypeId&quot;: &quot;08q9p0000000DtJAAU&quot;,&#10;    &quot;DurationInMinutes&quot;: &quot;120.0&quot;,&#10;    &quot;Asset_Conversion_Updated_in_GP__c&quot;: &quot;false&quot;,&#10;    &quot;Discount__c&quot;: &quot;0.0&quot;,&#10;    &quot;Division_State__c&quot;: &quot;VIC | 320&quot;,&#10;    &quot;Paid_in_Full__c&quot;: &quot;false&quot;,&#10;    &quot;LastModifiedById&quot;: &quot;0059p000001n2hdAAA&quot;&#10;  }]" doc:name="Hello" doc:id="1d70b947-a14c-42de-bd23-3687e66055a6" />
+				<set-variable value="" doc:name="Set Variable" doc:id="953a1f70-cdf4-4a6e-826a-0587bae5d44e" variableName="failedLineItems"/>
+		<parallel-foreach doc:name="Parallel For Each" doc:id="d07156cd-e286-4556-9f5c-650926b7063f" collection="#[payload.WorkOrderLineItems]" target="for_each_response">
+			<logger level="INFO" doc:name="paylaod1" doc:id="e022d4c1-3cf8-4cf2-bb79-a9dbefd6d0e2" message="#[payload]" />
+			<choice doc:name="Choice" doc:id="8df3ef18-b947-4392-b75c-40ede5b456c4">
+				<when expression="#[isBlank(payload.Serial_s__c) and payload.Consumed__c =='true']">
+					<ee:transform doc:name="Transform Message" doc:id="5c8ee3dc-7a87-4e21-9175-57e1c365d075">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+LineItems:
+	{
+    	Id: payload.Id,
+    	ItemNumber: payload.Status,
+        UnitPrice: payload.UnitPrice,
+		TotalPrice:payload.TotalPrice,
+		ItemCode: payload.GP_Item_Number__c,
+        Name: payload.Product2.Name,
+        Description: payload.Description,
+        ListPrice: payload.ListPrice,
+        Quantity: payload.Quantity,
+        PriceBookEnterId: payload.PricebookEntryId,
+        PriceBookName: payload.PricebookEntry.Name,
+        GPLineNo: payload.GP_Line_item_Sequence__c,
+	    Discount: payload.Discount__c as Number default 0,
+	    Location:{
+	    	GP_Location_Code__c: payload.Location.GP_Location_Code__c default ""
+	    }
+
+	}
+	
+	
+	
+]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+				</when>
+				<when expression="#[!isBlank(payload.Serial_s__c) and payload.Consumed__c =='true']">
+					<http:request method="GET" doc:name="hello" doc:id="0d2d6b86-802e-4d85-a27a-fe489871b393" path="/hello" target="serialized_parts_response" config-ref="HTTP_Request_configuration">
+						<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"itemNumber" : payload.Product_Code__c,
+	"serialNumber" : payload.Serial_s__c
+}]]]></http:query-params>
+					</http:request>
+					<choice doc:name="Choice" doc:id="44bbfb4e-a6fa-46b3-ae4c-de35694ed4f9">
+				<when expression="#[!isBlank(vars.serialized_parts_response.SERLNUMBR)]">
+							<ee:transform doc:name="Transform Message" doc:id="ab1b05b8-aca9-4768-9612-8ca7109cf249">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+LineItems:
+	{
+    	Id: payload.Id,
+    	ItemNumber: payload.Status,
+		ItemCode: payload.GP_item_Number__c,
+        Name: payload.Product2.Name,
+        Description: payload.Description,
+        ListPrice: payload.ListPrice,
+        Quantity: payload.Quantity,
+        TotalPrice: vars.serialized_parts_response.UNITCOST,
+        UnitPrice: vars.serialized_parts_response.UNITCOST,
+        PriceBookEnterId: payload.PricebookEntryId,
+        PriceBookName: payload.PricebookEntry.Name,
+        GPLineNo: payload.GP_Line_item_Sequence__c,
+	    Location:{
+	    	GP_Location_Code__c: payload.Location.GP_Location_Code__c default ""
+	    },
+	    Discount: payload.Discount__c as Number default 0,
+	}
+	
+	
+	
+]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+							<logger level="INFO" doc:name="Logger" doc:id="1cc4ce57-8284-4503-995b-f3e15cf5ed46" message="#[payload]" />
+				</when>
+				<otherwise>
+					<logger level="INFO" doc:name="Logger" doc:id="3731b6df-3097-4f37-be2b-a58c3363081e" message="#[payload]" />
+							<ee:transform doc:name="failedLineItems" doc:id="dc54f5a3-b86b-4ea5-8bfb-dac6e76e6b56" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+LineItems:
+	{
+    	Id: payload.Id,
+    	ItemNumber: payload.Status,
+        UnitPrice: payload.UnitPrice,
+		TotalPrice:payload.TotalPrice,
+		ItemCode: payload.GP_item_Number__c,
+        Name: payload.Product2.Name,
+        Description: payload.Description,
+        ListPrice: payload.ListPrice,
+        Quantity: payload.Quantity,
+        PriceBookEnterId: payload.PricebookEntryId,
+        PriceBookName: payload.PricebookEntry.Name,
+        GPLineNo: payload.GP_Line_item_Sequence__c,
+        GP_Serialized_Parts_Response__C: "No serial found in GP.",
+	    Location:{
+	    	GP_Location_Code__c: payload.Location.GP_Location_Code__c default ""
+	    },
+	    Discount: payload.Discount__c as Number default 0,
+
+	}
+	
+	
+	
+]]></ee:set-payload>
+								</ee:message>
+								<ee:variables >
+								</ee:variables>
+							</ee:transform>
+				</otherwise>
+			</choice>
+				</when>
+				<otherwise>
+					<logger level="INFO" doc:name="Logger" doc:id="928fd626-1b77-45ec-bc46-adf0c3ad90b9" />
+				</otherwise>
+			</choice>
+		</parallel-foreach>
+		<ee:transform doc:name="Transform Message" doc:id="6c56cf57-b8ff-4b55-92d5-f94806bdea48">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+fun pymtType (p) = p match {
+    case "Cash Deposit" -> 1
+    case "Check Deposit" -> 2
+    case "Credit Card Deposit" -> 3
+    case "Cash Payment" -> 4
+    case "Check Payment" -> 5
+    case "Credit Card Payment" -> 6
+    else -> 3
+}
+---
+{
+	Id: payload.Id, 
+	OrderNumber: payload.WorkOrderNumber,
+	GPOrderId: payload.GP_Invoice__c,
+	OrderStatus: payload.Status,
+	OrderType: payload.'type',
+	TotalAmount: payload.Total_Claim__c,
+	Latitude: payload.Latitude,
+	Longtitude: payload.Longitude,
+	PONumber: payload.Purchase_Order_number__c,
+	Description: payload.Description,
+	AccountNumber: payload.Account.Debtor_ID__c,
+	AmountPaid: payload.Amount_Received__c,
+	PaymentType: pymtType(payload.Payment_Type__c),
+	ChequeNumber: payload.Cheque_Number__c,
+    MailingAddress: {
+    	Street: payload.Address.street,
+        City: payload.Address.city,
+        State: payload.Address.state,
+        Country: payload.Address.country,
+        Postcode: payload.Address.postalCode,
+    },
+    Location:{
+    	GP_Location_Code__c: payload.Location.GP_Location_Code__c default "",
+    },
+	Discount: payload.Discount__c as Number default 0,
+    LineItems: vars.for_each_response.payload.LineItems map (item,index)->{
+    	Id:item.Id,
+    	ItemNumber:item.ItemNumber,
+    	UnitPrice:item.UnitPrice,
+    	TotalPrice:item.TotalPrice,
+		ItemCode: item.ItemCode,
+        Name: item.Name,
+        Description: item.Description,
+        ListPrice: item.ListPrice,
+        Quantity: item.Quantity,
+        PriceBookEnterId: item.PriceBookEnterId,
+        PriceBookName: item.PriceBookName,
+        GPLineNo: item.GPLineNo,
+		Discount: item.Discount,
+	    Location:{
+	    	GP_Location_Code__c: item.GP_Location_Code__c
+	    }
+    	
+    	    	
+    	   }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-payload value='#[{"description":&#10;{&#10;"lineItems":&#10;[{&#10;  &#10;   "sf_OrderItemNumber":"0WO9p000000KSD3GAO",&#10;   "orderItemId": "1WL9p0000006aLlGAI"&#10;  &#10;},&#10;{&#10;  &#10;   "sf_OrderItemNumber":"231sasdf",&#10;   "orderItemId": "1WL9p0000006aNNGAY"&#10;  &#10;},&#10;{&#10;  &#10;   "sf_OrderItemNumber":"0WO9p000000KSD3GAO",&#10;   "orderItemId": "1WL9p0000006aNNGAY3"&#10;  &#10;},&#10;{&#10;  &#10;   "sf_OrderItemNumber":"231sasdf",&#10;   "orderItemId": "1WL9p0000006aNNGAY455"&#10;  &#10;}&#10;]&#10;}}]' doc:name="Set Payload" doc:id="5f2316f6-d88a-4dd4-aa3e-73a26ddd1548" />
+		<ee:transform doc:name="Transform Message" doc:id="ef723b7f-307f-4021-820e-a310422fcb5a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="0267c55a-c29e-4e0e-a146-1a2a149caf51" name="put_sf_work_order"/>
+		<logger level="INFO" doc:name="paylaod" doc:id="570ef3dc-cd32-48db-bcd2-4ea5fb1c962f" message="#[payload]" />
+	</flow>
+	<sub-flow name="put_sf_work_order" doc:id="c7c361bb-5d9e-4384-ad0b-9d261837dd7f" >
+		<choice doc:name="Choice" doc:id="4a2aa65e-8e07-4de3-b413-d861e1826413" >
+			<when expression="#[(payload.code default 200) == 200]" >
+				<logger level="INFO" doc:name="Logger" doc:id="4cb14818-d51e-41a6-8bb4-d16be9f4c971" message="#[vars.for_each_response.payload.LineItems]"/>
+				<ee:transform doc:name="put request work order" doc:id="84c2e56a-0ebf-49f2-98ba-58c036cb45f3" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+---
+payload.description mapObject ((value, key, index) -> {
+    (if (key ~= "id")
+        Id: value
+    else if (key ~= "orderNumber"){}
+    else if (key ~= "externalId")
+        GP_Invoice__c: value
+    else if (key ~= "lineItems"){
+        lineItems: value map ((item,index) ->{
+            Id: item.orderItemId,
+           // GP_Line_Item_Sequence__c: item.externalItemId,
+            //(GP_Serialized_Parts_Response__C: vars.for_each_response.payload.LineItems[index].GP_Serialized_Parts_Response__C) if (item.orderItemId == vars.for_each_response.payload.LineItems[index].Id),
+            data: vars.for_each_response.payload.LineItems[?($.Id == item.orderItemId)],
+  			
+            Parts_Unit_Cost_GP__c: vars.for_each_response.payload.LineItems[?($.Id == item.orderItemId)][0].UnitCost,
+
+
+//Map Error message to 'GP_Serialized_Parts_Response__C' in case serial number is not found in GP
+            //(GP_Serialized_Parts_Response__C: vars.serializedPartsResponse.payload.LineItems[index].GP_Serialized_Parts_Response__C) if (item.orderItemId == vars.serializedPartsResponse.payload.LineItems[index].Id)
+            GP_Serialized_Parts_Response__C: vars.for_each_response.payload.LineItems[?(vars.for_each_response.payload.LineItems.Id == item.orderItemId)][0].GP_Serialized_Parts_Response__C
+    
+        })
+    }
+    else 
+        (key): value)
+}) ++ {
+	GP_Status__c: "Success",
+	Status: "Invoiced",
+	
+}
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="83e023e4-89fb-4d84-9097-77f4643bac59" message="#[payload]"/>
+			</when>
+		</choice>
+	</sub-flow>
+</mule>

@@ -1,0 +1,83 @@
+%dw 2.0
+
+type auto_c7c361bb_5d9e_4384_ad0b_9d261837dd7f_Output_Variables_for_each_response = Array<org_mule_runtime_api_message_Message>
+type org_mule_runtime_api_message_Message = {|
+  payload: {|
+    Product2?: {|
+      ProductCode: String, 
+      Id: String, 
+      "type": String, 
+      Name: String
+    |}, 
+    UnitPrice?: String, 
+    CreatedById?: String, 
+    LineItems?: {|
+      Id: String, 
+      ItemNumber: String, 
+      ItemCode: Null, 
+      Name: String, 
+      Description: Null | String, 
+      ListPrice: String, 
+      Quantity: String, 
+      TotalPrice: Any, 
+      UnitPrice: Any, 
+      PriceBookEnterId: String, 
+      PriceBookName: String, 
+      GPLineNo: Null, 
+      Location: {| GP_Location_Code__c: String |}
+    |}, 
+    StatusCategory?: String, 
+    GP_Item_Number__c?: String, 
+    Division_Type__c?: String, 
+    GP_Debit_Division_Code__c?: String, 
+    CreatedDate?: String, 
+    LastModifiedDate?: String, 
+    LineItemNumber?: String, 
+    GL_Debit_Code__c?: String, 
+    Product_Category__c?: String, 
+    IsGeneratedFromMaintenancePlan?: String, 
+    Discount__c?: String, 
+    Subtotal?: String, 
+    GP_Credit_Division_Code__c?: String, 
+    Serial_s__c?: String, 
+    PricebookEntry?: {|
+      Id: String, 
+      "type": String, 
+      Name: String
+    |}, 
+    Id?: String, 
+    TotalPrice?: String, 
+    Priority?: String, 
+    Total_Cost_Parts__c?: String, 
+    PricebookEntryId?: String, 
+    "type"?: String, 
+    FSL__IsFillInCandidate__c?: String, 
+    GL_Credit_Code__c?: String, 
+    LastModifiedById?: String, 
+    X3rd_Party_Parts_Description__c?: String, 
+    Quantity?: String, 
+    GP_Price_Check_Status__c?: String, 
+    IsDeleted?: String, 
+    DurationType?: String, 
+    WorkOrderId?: String, 
+    LocationId?: String, 
+    SystemModstamp?: String, 
+    Product2Id?: String, 
+    Work_Order_Status__c?: String, 
+    Division_State__c?: String, 
+    Description?: String, 
+    RootWorkOrderLineItemId?: String, 
+    ListPrice?: String, 
+    Covered_by_Warranty__c?: String, 
+    IsClosed?: String, 
+    Product_Code__c?: String, 
+    Location?: {| "type": String |}, 
+    Consumed__c?: String, 
+    ServiceAppointmentCount?: String, 
+    Status?: String
+  |}, 
+  attributes: Null
+|} {"typeId": "org.mule.runtime.api.message.Message"}
+
+
+
