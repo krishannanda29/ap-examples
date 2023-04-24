@@ -35,7 +35,7 @@
 						<muleVersion>4.4.0</muleVersion>
 						<connectedAppClientId>${client_id}</connectedAppClientId>
 						<connectedAppClientSecret>${client_secret}</connectedAppClientSecret>
-						<connectedAppGrantType>${client_credentials}</connectedAppGrantType>
+						<connectedAppGrantType>client_credentials</connectedAppGrantType>
 						<applicationName>apdev-examples-connectedApp</applicationName>
 						<environment>Sandbox</environment>
 						<workerType>MICRO</workerType>
@@ -65,51 +65,9 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-sockets-connector</artifactId>
-			<version>1.2.2</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-vm-connector</artifactId>
-			<version>2.0.0</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.mulesoft.connectors</groupId>
-			<artifactId>anypoint-mq-connector</artifactId>
-			<version>3.1.7</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-file-connector</artifactId>
-			<version>1.5.0</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-db-connector</artifactId>
-			<version>1.13.6</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>8.0.16</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-objectstore-connector</artifactId>
-			<version>1.2.1</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-jms-connector</artifactId>
-			<version>1.8.4</version>
-			<classifier>mule-plugin</classifier>
 		</dependency>
 	</dependencies>
 
